@@ -28,6 +28,9 @@ async def get_optional_token(
     if not authorization or scheme.lower() != "bearer":
         return None, False
 
+    if not access_token.isascii():
+        return None, True
+
     token = await oauth2_token_service.get_by_access_token(session, access_token)
     return token, True
 

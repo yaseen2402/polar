@@ -57,3 +57,18 @@ class TestOAuth2UserInfo:
 
         json = response.json()
         assert json["sub"] == str(user.id)
+
+    async def test_non_ascii_token(
+        self,
+        method: str,
+        client: AsyncClient,
+    ) -> None:
+        response = await client.request(
+            method,
+            "/v1/oauth2/userinfo",
+            headers=[(b"Authorization", b"Bearer polar_at_invalid_\xc3\xa9_token")],
+        )
+
+        assert response.status_code == 401
+        json = response.json()
+        assert json["error"] == "invalid_token"
